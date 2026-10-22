@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+>
+  <owl:Ontology rdf:about="https://dfg-sos.github.io/ontologies/cwl">
+    <owl:versionInfo>1.0.0</owl:versionInfo>
+    <owl:versionIRI rdf:resource="https://dfg-sos.github.io/ontologies/releases/cwl/1.0.0/cwl.owl"/>
+    <dcterms:title>SOS extensions for the Common Workflow Language</dcterms:title>
+    <dcterms:description>Extension fields for CWL File ports that state metadata a file must have, beyond its format. Declare the namespace in a CWL document with $namespaces: {sos: "https://dfg-sos.github.io/ontologies/cwl#"}.</dcterms:description>
+    <dcterms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
+    <dcterms:publisher>DFG project SOS</dcterms:publisher>
+    <rdfs:seeAlso rdf:resource="https://github.com/dfg-sos/ontologies"/>
+  </owl:Ontology>
+  <owl:DatatypeProperty rdf:about="https://dfg-sos.github.io/ontologies/cwl#expectedCRS">
+    <rdfs:label>expected CRS</rdfs:label>
+    <rdfs:comment>Coordinate reference system the file on this port must use, as a string understood by pyproj, e.g. "EPSG:4326". Example: outputs: {roads: {type: File, format: eo:GeoJSON, sos:expectedCRS: "EPSG:4326"}}.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:about="https://dfg-sos.github.io/ontologies/cwl#expectedGeometryType">
+    <rdfs:label>expected geometry type</rdfs:label>
+    <rdfs:comment>Geometry type the features of a vector file on this port must have, as a GeoJSON geometry type (e.g. "Point", "LineString", "MultiPolygon"; single and multi variants are treated as compatible). Ignored for raster formats.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </owl:DatatypeProperty>
+</rdf:RDF>
