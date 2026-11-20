@@ -17,7 +17,8 @@ jobs:
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v5
       - name: Check vocabularies and build the site
-        run: uv run scripts/build.py build
+        # On main, every current version must have its release copy, so owl:versionIRI never 404s.
+        run: uv run scripts/build.py ${{ github.event_name == 'push' && '--require-releases' || '' }} build
       - name: Released files are never changed
         env:
           BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || github.event.before }}
