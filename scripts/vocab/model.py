@@ -1,4 +1,5 @@
-"""The vocabularies of this repository: `<name>.owl` (the current version) and its release copies."""
+"""The vocabularies of this repository: `<name>.ttl` (the source of the current version) and the
+release copies `releases/<name>/<version>/<name>.owl` (RDF/XML, the published files)."""
 
 from __future__ import annotations
 
@@ -11,6 +12,8 @@ from pathlib import Path
 from rdflib import OWL, RDF, Graph, URIRef
 from rdflib.term import Node
 
+from . import rdf_xml
+
 ROOT = Path(__file__).resolve().parents[2]
 BASE = "https://dfg-sos.github.io/ontologies/"
 VOCABULARIES = ["eo-formats", "cwl", "resource-demand"]
@@ -19,10 +22,19 @@ VERSION = re.compile(r"\d+\.\d+\.\d+")
 RELEASE_IRI = re.compile(re.escape(BASE) + r"releases/([a-z0-9-]+)/(\d+\.\d+\.\d+)/\1\.owl")
 
 
+FORMATS = {".ttl": "turtle", ".owl": "xml"}
+
+
 def load(path: Path) -> Graph:
-    graph = Graph()
-    graph.parse(path, format="xml")
+    """A Turtle or RDF/XML file. Only the file's own prefixes are bound, not rdflib's defaults."""
+    graph = Graph(bind_namespaces="none")
+    graph.parse(path, format=FORMATS[path.suffix])
     return graph
+
+
+def to_rdf_xml(graph: Graph) -> str:
+    """Deterministic RDF/XML with typed elements (<owl:Class>), as OWL tools write it."""
+    return rdf_xml.serialize(graph)
 
 
 def uris(nodes: Iterable[Node]) -> set[URIRef]:
@@ -81,13 +93,19 @@ class Vocabulary:
 
     @property
     def source(self) -> Path:
-        return ROOT / f"{self.name}.owl"
+        """The Turtle file that is edited."""
+        return ROOT / f"{self.name}.ttl"
 
     def release_dir(self, version: str) -> Path:
         return ROOT / "releases" / self.name / version
 
     def release_source(self, version: str) -> Path:
+        """The published RDF/XML copy of a release."""
         return self.release_dir(version) / f"{self.name}.owl"
+
+    def release_turtle(self, version: str) -> Path:
+        """The Turtle source of a release; releases before the switch to Turtle have none."""
+        return self.release_dir(version) / f"{self.name}.ttl"
 
     def release_iri(self, version: str) -> URIRef:
         return URIRef(f"{BASE}releases/{self.name}/{version}/{self.name}.owl")
@@ -104,4 +122,4 @@ class Vocabulary:
 
 def load_all() -> dict[str, Vocabulary]:
     """The current version of every vocabulary, by name."""
-    return {name: Vocabulary(name, load(ROOT / f"{name}.owl")) for name in VOCABULARIES}
+    return {name: Vocabulary(name, load(ROOT / f"{name}.ttl")) for name in VOCABULARIES}

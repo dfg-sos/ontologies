@@ -93,7 +93,7 @@ def check_references(vocab: Vocabulary, vocabularies: dict[str, Vocabulary], rep
 
 
 def check_releases(vocab: Vocabulary, report: Report, require_released: bool) -> None:
-    """`<name>.owl` is served as the latest version, so it may only grow: every term of every
+    """`<name>.owl` is served as the latest version (generated from `<name>.ttl`), so it may only grow: every term of every
     release stays declared (deprecate with owl:deprecated instead of removing) and keeps its parents."""
     if not VERSION.fullmatch(vocab.version):
         return
@@ -104,7 +104,7 @@ def check_releases(vocab: Vocabulary, report: Report, require_released: bool) ->
         old = vocab.release(version)
         if version == vocab.version:
             if not isomorphic(old.graph, vocab.graph):
-                report.errors.append(f"{vocab.name}.owl differs from release {version}: raise owl:versionInfo")
+                report.errors.append(f"{vocab.name}.ttl differs from release {version}: raise owl:versionInfo")
             continue
         if version_key(version) > version_key(vocab.version):
             report.errors.append(f"owl:versionInfo {vocab.version} is lower than release {version}")

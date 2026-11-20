@@ -5,8 +5,9 @@
     uv run scripts/build.py release eo-formats 1.1.0   # immutable copy of the current version
     uv run scripts/build.py --require-releases build   # CI on main: the current versions must be released
 
-Only the RDF/XML files (`<name>.owl` and `releases/<name>/<version>/<name>.owl`) are committed.
-The site (Turtle, HTML and the .owl files themselves) is generated from them into _site/ by CI.
+The Turtle sources `<name>.ttl` are edited. A release writes its fixed copy
+`releases/<name>/<version>/<name>.owl` (RDF/XML, generated) and `<name>.ttl` next to it; both are
+committed and never change. The site (the latest `<name>.owl`, HTML) is generated into _site/ by CI.
 The code lives in scripts/vocab/: model.py, checks.py and site.py.
 """
 
@@ -17,21 +18,22 @@ import shutil
 import sys
 
 from vocab.checks import check
-from vocab.model import ROOT, VOCABULARIES, Vocabulary, load_all
+from vocab.model import ROOT, VOCABULARIES, Vocabulary, load_all, to_rdf_xml
 from vocab.site import build_site
 
 
 def release(vocab: Vocabulary, version: str) -> int:
     if vocab.version != version:
-        print(f"error   {vocab.name}.owl has owl:versionInfo {vocab.version}, not {version}")
+        print(f"error   {vocab.name}.ttl has owl:versionInfo {vocab.version}, not {version}")
         return 1
     target = vocab.release_dir(version)
     if target.exists():
         print(f"error   {target.relative_to(ROOT)} exists; released versions are never changed")
         return 1
     target.mkdir(parents=True)
-    shutil.copy2(vocab.source, vocab.release_source(version))
-    print(f"wrote   {target.relative_to(ROOT)}/")
+    vocab.release_source(version).write_text(to_rdf_xml(vocab.graph))
+    shutil.copy2(vocab.source, vocab.release_turtle(version))
+    print(f"wrote   {target.relative_to(ROOT)}/ ({vocab.name}.owl and {vocab.name}.ttl)")
     return 0
 
 
