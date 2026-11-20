@@ -1,0 +1,26 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix sos: <https://dfg-sos.github.io/ontologies/cwl#> .
+
+<https://dfg-sos.github.io/ontologies/cwl> a owl:Ontology ;
+    owl:versionInfo "1.0.0" ;
+    owl:versionIRI <https://dfg-sos.github.io/ontologies/releases/cwl/1.0.0/cwl.owl> ;
+    dcterms:title "SOS extensions for the Common Workflow Language" ;
+    dcterms:description "Extension fields for CWL File ports that state metadata a file must have, beyond its format. Declare the namespace in a CWL document with $namespaces: {sos: \"https://dfg-sos.github.io/ontologies/cwl#\"}." ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcterms:publisher "DFG project SOS" ;
+    rdfs:seeAlso <https://github.com/dfg-sos/ontologies> .
+
+# --- File metadata fields for CWL File ports ---
+
+sos:expectedCRS a owl:DatatypeProperty ;
+    rdfs:label "expected CRS" ;
+    rdfs:comment "Coordinate reference system the file on this port must use, as a string understood by pyproj, e.g. \"EPSG:4326\". Example: outputs: {roads: {type: File, format: eo:GeoJSON, sos:expectedCRS: \"EPSG:4326\"}}." ;
+    rdfs:range xsd:string .
+
+sos:expectedGeometryType a owl:DatatypeProperty ;
+    rdfs:label "expected geometry type" ;
+    rdfs:comment "Geometry type the features of a vector file on this port must have, as a GeoJSON geometry type (e.g. \"Point\", \"LineString\", \"MultiPolygon\"; single and multi variants are treated as compatible). Ignored for raster formats." ;
+    rdfs:range xsd:string .

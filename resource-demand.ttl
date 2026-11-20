@@ -1,0 +1,147 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rd: <https://dfg-sos.github.io/ontologies/resource-demand#> .
+
+<https://dfg-sos.github.io/ontologies/resource-demand> a owl:Ontology ;
+    owl:versionInfo "1.0.0" ;
+    owl:versionIRI <https://dfg-sos.github.io/ontologies/releases/resource-demand/1.0.0/resource-demand.owl> ;
+    dcterms:title "SOS resource demand annotations for CWL" ;
+    dcterms:description "Extension fields for CWL documents that state how the resource demand of a tool grows with its inputs (parametric dependencies), as a static annotation next to the input schema: complexity variables on input parameters, demand expressions in ResourceRequirement. The annotation states only the shape of the dependency (a sum of products of complexity classes); coefficients are not part of it. A complexity variable stands for a Measure of an input: its value, array length or file size, a domain measure such as the pixel count of a raster (see eo-formats), or a derived measure computed by a probe tool. Declare the namespace in a CWL document with $namespaces: {rd: \"https://dfg-sos.github.io/ontologies/resource-demand#\"}." ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcterms:publisher "DFG project SOS" ;
+    rdfs:seeAlso <https://github.com/dfg-sos/ontologies> .
+
+# --- Annotation properties ---
+
+rd:bigO a owl:AnnotationProperty ;
+    rdfs:label "Big O notation" ;
+    rdfs:comment "The complexity class in Big O notation, for display." .
+
+rd:growthFunction a owl:AnnotationProperty ;
+    rdfs:label "growth function" ;
+    rdfs:comment "Representative function g(x) of a complexity class, as an expression in the variable x using +, -, *, /, ** and log (natural logarithm). An estimator fits a * g(x) per factor; this annotation tells it which g to use." .
+
+rd:unit a owl:AnnotationProperty ;
+    rdfs:label "unit" ;
+    rdfs:comment "Unit in which the demand of a demand property is estimated." .
+
+# --- Measures ---
+
+rd:Measure a owl:Class ;
+    rdfs:label "Measure" ;
+    rdfs:comment "A quantity taken from the value of an input parameter, used as a complexity variable. Measures are referenced by IRI in rd:complexityVariables. Format-specific measures (pixel count, feature count, ...) are defined in domain vocabularies such as eo-formats as subclasses of this class." .
+
+rd:Value a owl:Class ;
+    rdfs:label "Value" ;
+    rdfs:subClassOf rd:Measure ;
+    rdfs:comment "The numeric value of an int, long, float or double parameter." .
+
+rd:ArrayLength a owl:Class ;
+    rdfs:label "Array length" ;
+    rdfs:subClassOf rd:Measure ;
+    rdfs:comment "The number of items of an array parameter." .
+
+rd:FileSize a owl:Class ;
+    rdfs:label "File size" ;
+    rdfs:subClassOf rd:Measure ;
+    rdfs:comment "The size in bytes of a File parameter (CWL File.size), without its secondaryFiles. For an array of Files, the sum of their sizes." .
+
+rd:DerivedMeasure a owl:Class ;
+    rdfs:label "Derived measure" ;
+    rdfs:subClassOf rd:Measure ;
+    rdfs:comment "A characteristic of the input that cannot be read from its type or format, computed by a probe: a CWL CommandLineTool, referenced with rd:probe, that takes the parameter as input and returns a single number. Domain vocabularies may name derived measures as subclasses of this class." .
+
+# --- Complexity classes ---
+
+rd:ComplexityClass a owl:Class ;
+    rdfs:label "Complexity class" ;
+    rdfs:comment "How a demand grows with one complexity variable, in the sense of Big O notation. Referenced by IRI as the complexity of a factor in a demand term." .
+
+rd:Constant a owl:Class ;
+    rdfs:label "Constant" ;
+    rdfs:subClassOf rd:ComplexityClass ;
+    rdfs:comment "The demand does not grow with the variable. States explicitly that a variable was considered and has no effect." ;
+    rd:bigO "O(1)" ;
+    rd:growthFunction "1" .
+
+rd:Logarithmic a owl:Class ;
+    rdfs:label "Logarithmic" ;
+    rdfs:subClassOf rd:ComplexityClass ;
+    rd:bigO "O(log n)" ;
+    rd:growthFunction "log(x)" .
+
+rd:Linear a owl:Class ;
+    rdfs:label "Linear" ;
+    rdfs:subClassOf rd:ComplexityClass ;
+    rd:bigO "O(n)" ;
+    rd:growthFunction "x" .
+
+rd:Linearithmic a owl:Class ;
+    rdfs:label "Linearithmic" ;
+    rdfs:subClassOf rd:ComplexityClass ;
+    rd:bigO "O(n log n)" ;
+    rd:growthFunction "x * log(x)" .
+
+rd:Quadratic a owl:Class ;
+    rdfs:label "Quadratic" ;
+    rdfs:subClassOf rd:ComplexityClass ;
+    rd:bigO "O(n^2)" ;
+    rd:growthFunction "x ** 2" .
+
+rd:Cubic a owl:Class ;
+    rdfs:label "Cubic" ;
+    rdfs:subClassOf rd:ComplexityClass ;
+    rd:bigO "O(n^3)" ;
+    rd:growthFunction "x ** 3" .
+
+rd:Exponential a owl:Class ;
+    rdfs:label "Exponential" ;
+    rdfs:subClassOf rd:ComplexityClass ;
+    rd:bigO "O(2^n)" ;
+    rd:growthFunction "2 ** x" .
+
+# --- CWL fields ---
+
+rd:complexityVariables a owl:ObjectProperty ;
+    rdfs:label "complexity variables" ;
+    rdfs:comment "Field of a CWL input parameter: a list of variables that the demand expressions of the tool can refer to. Each item has the keys symbol (a name, unique within the tool, matching [A-Za-z_][A-Za-z0-9_]*), measure (the IRI of a rd:Measure subclass) and, for a rd:DerivedMeasure, probe (path to the probe tool). Example: inputs: {raster: {type: File, format: eo:GeoTIFF, rd:complexityVariables: [{symbol: n, measure: eo:PixelCount}]}}. Do not use the keys id, name, type or format: CWL rewrites them." .
+
+rd:ramDemand a owl:ObjectProperty ;
+    rdfs:label "RAM demand" ;
+    rdfs:comment "Field of a CWL ResourceRequirement: how the peak memory of the tool grows with its complexity variables. A list of terms that are added; each term has the key factors, a list of factors that are multiplied; each factor has the keys variable (a symbol from rd:complexityVariables) and complexity (the IRI of a rd:ComplexityClass subclass). A term without factors is a constant. Example for O(n + d^2): rd:ramDemand: [{factors: [{variable: n, complexity: rd:Linear}]}, {factors: [{variable: d, complexity: rd:Quadratic}]}]." ;
+    rd:unit "MiB (as CWL ramMin)" .
+
+rd:timeDemand a owl:ObjectProperty ;
+    rdfs:label "time demand" ;
+    rdfs:comment "Field of a CWL ResourceRequirement: how the wall-clock time to result of the tool grows with its complexity variables. Same structure as rd:ramDemand. Example for O(n * d): rd:timeDemand: [{factors: [{variable: n, complexity: rd:Linear}, {variable: d, complexity: rd:Linear}]}]." ;
+    rd:unit "seconds (as CWL ToolTimeLimit)" .
+
+# --- Keys inside the fields above, as RDF properties for validation (SHACL) ---
+
+rd:symbol a owl:DatatypeProperty ;
+    rdfs:label "symbol" ;
+    rdfs:comment "Key in a rd:complexityVariables item: the variable's name, used by the factors of demand terms." ;
+    rdfs:range xsd:string .
+
+rd:measure a owl:ObjectProperty ;
+    rdfs:label "measure" ;
+    rdfs:comment "Key in a rd:complexityVariables item: which quantity of the parameter the variable stands for, a subclass of rd:Measure." .
+
+rd:probe a owl:ObjectProperty ;
+    rdfs:label "probe" ;
+    rdfs:comment "Key in a rd:complexityVariables item: the CWL CommandLineTool that computes a rd:DerivedMeasure, as a path relative to the annotated document or an absolute IRI. Required for derived measures, not allowed otherwise." .
+
+rd:factors a owl:ObjectProperty ;
+    rdfs:label "factors" ;
+    rdfs:comment "Key in a demand term: the factors that are multiplied to form the term." .
+
+rd:variable a owl:DatatypeProperty ;
+    rdfs:label "variable" ;
+    rdfs:comment "Key in a factor: the symbol of a complexity variable declared on an input of the same tool." ;
+    rdfs:range xsd:string .
+
+rd:complexity a owl:ObjectProperty ;
+    rdfs:label "complexity" ;
+    rdfs:comment "Key in a factor: how the demand grows with the variable, a subclass of rd:ComplexityClass." .

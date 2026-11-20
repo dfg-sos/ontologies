@@ -1,0 +1,343 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix oboInOwl: <http://www.geneontology.org/formats/oboInOwl#> .
+@prefix eo: <https://dfg-sos.github.io/ontologies/eo-formats#> .
+@prefix rd: <https://dfg-sos.github.io/ontologies/resource-demand#> .
+
+<https://dfg-sos.github.io/ontologies/eo-formats> a owl:Ontology ;
+    owl:versionInfo "1.1.0" ;
+    owl:versionIRI <https://dfg-sos.github.io/ontologies/releases/eo-formats/1.1.0/eo-formats.owl> ;
+    owl:priorVersion <https://dfg-sos.github.io/ontologies/releases/eo-formats/1.0.0/eo-formats.owl> ;
+    owl:imports <https://dfg-sos.github.io/ontologies/releases/cwl/1.0.0/cwl.owl>,
+        <https://dfg-sos.github.io/ontologies/releases/resource-demand/1.0.0/resource-demand.owl> ;
+    dcterms:title "SOS Earth Observation vocabulary" ;
+    dcterms:description "Earth Observation / GIS vocabulary. File formats: a taxonomy of EO file formats (GeoTIFF, COG, Shapefile, GeoJSON, ...) under the abstract classes Raster and Vector; format compatibility follows rdfs:subClassOf. File metadata: the fields sos:expectedCRS and sos:expectedGeometryType, defined in the imported cwl vocabulary. Measures: quantities of raster and vector files (pixel count, feature count, ...) that a runner probes from an input file, for use as complexity variables (rd:complexityVariables of the imported resource-demand vocabulary); each states with eo:appliesToFormat which formats it can be taken from. Declare in a CWL document with $namespaces: {eo: \"https://dfg-sos.github.io/ontologies/eo-formats#\"}." ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcterms:publisher "DFG project SOS" ;
+    rdfs:seeAlso <https://github.com/dfg-sos/ontologies> .
+
+# --- File formats: annotations ---
+
+eo:documentation a owl:AnnotationProperty ;
+    rdfs:label "documentation" ;
+    rdfs:comment "Link to the specification or documentation of the format." .
+
+eo:fileExtension a owl:AnnotationProperty ;
+    rdfs:label "file extension" ;
+    rdfs:comment "A typical file extension of the format." .
+
+eo:mediaType a owl:AnnotationProperty ;
+    rdfs:label "media type" ;
+    rdfs:comment "Media type (MIME type) of the format." .
+
+# --- File formats: abstract classes ---
+
+eo:GIS a owl:Class ;
+    rdfs:label "Geographical data format" ;
+    oboInOwl:hasExactSynonym "GIS Data",
+        "Geographical information format" ;
+    oboInOwl:hasNarrowSynonym "GIS file format" ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/GIS_file_formats> .
+
+eo:Raster a owl:Class ;
+    rdfs:label "Raster (GIS)" ;
+    rdfs:subClassOf eo:GIS ;
+    oboInOwl:hasNarrowSynonym "Grid format" ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/GIS_file_formats#Raster> .
+
+eo:Vector a owl:Class ;
+    rdfs:label "Vector (GIS)" ;
+    rdfs:subClassOf eo:GIS ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/GIS_file_formats#Vector> .
+
+# --- File formats: raster ---
+
+eo:DEM a owl:Class ;
+    rdfs:label "DEM" ;
+    rdfs:subClassOf eo:Raster ;
+    oboInOwl:created_by "melibleq" ;
+    oboInOwl:creation_date "2021-08-26T04:36:50.785363Z" ;
+    oboInOwl:hasExactSynonym "Digital Elevation Model" ;
+    rdfs:seeAlso <https://docs.fileformat.com/gis/dem/>,
+        <https://library.carleton.ca/guides/help/dem-formats>,
+        <https://www.loc.gov/preservation/digital/formats/fdd/fdd000285.shtml> ;
+    eo:fileExtension ".tif",
+        ".tiff" .
+
+eo:DSM a owl:Class ;
+    rdfs:label "DSM" ;
+    rdfs:subClassOf eo:Raster ;
+    oboInOwl:created_by "mpataky" ;
+    oboInOwl:creation_date "2026-02-15T21:00:20+01:00" ;
+    oboInOwl:hasExactSynonym "Digital Surface Model" ;
+    rdfs:seeAlso <https://support.esri.com/en-us/gis-dictionary/digital-surface-model> ;
+    eo:fileExtension ".tif",
+        ".tiff" .
+
+eo:DTM a owl:Class ;
+    rdfs:label "DTM" ;
+    rdfs:subClassOf eo:Raster ;
+    oboInOwl:created_by "mpataky" ;
+    oboInOwl:creation_date "2026-02-15T21:06:34+01:00" ;
+    oboInOwl:hasExactSynonym "Digital Terrain Model" ;
+    rdfs:seeAlso <https://gdal.org/en/stable/tutorials/raster_dtm_tut.html> ;
+    eo:fileExtension ".tif",
+        ".tiff" .
+
+eo:GRIB a owl:Class ;
+    rdfs:label "GRIB" ;
+    rdfs:subClassOf eo:Raster ;
+    rdfs:comment "GRIB is specific for weather data. Highly compressed (more than NetCDF). Standardised by the World Meteorological Organization, using two different coding standards: GRIB 1 and GRIB 2. A GRIB record must have a header, which describes that record, and the actual binary data itself." ;
+    oboInOwl:created_by "Matúš Kalaš" ;
+    oboInOwl:creation_date "2021-08-26T13:42:00.666692Z" ;
+    oboInOwl:hasDefinition "Standard format for archiving and distributing gridded data, especially weather data. Since it is a binary format, that data is packed to increase storage efficiency. It is a collection of self-contained records of 2D data." ;
+    oboInOwl:hasExactSynonym "GRIdded Binary",
+        "General Regularly distributed Information in Binary form" ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/GRIB>,
+        <https://old.wmo.int/extranet/pages/prog/www/WMOCodes/Guides/GRIB/Introduction_GRIB1-GRIB2.pdf> ;
+    eo:documentation <https://codes.wmo.int/def/_grib1>,
+        <https://codes.wmo.int/def/grib2> ;
+    eo:fileExtension "gb",
+        "grb",
+        "grib",
+        "grib1",
+        "grib2" .
+
+eo:GeoTIFF a owl:Class ;
+    rdfs:label "GeoTIFF" ;
+    rdfs:subClassOf eo:Raster ;
+    oboInOwl:created_by "melibleq" ;
+    oboInOwl:creation_date "2021-08-29T15:54:37.290778Z" ;
+    oboInOwl:hasDefinition "The GeoTIFF file format allows a TIFF file to be enriched with georeferencing metadata, such as map projections, coordinate systems, ellipsoids, and datums. With GeoTIFF, the raw pixels of an image can be stored and organized in particular ways." ;
+    oboInOwl:hasExactSynonym "Geographic Tagged Image File Format" ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/GeoTIFF>,
+        <https://github.com/OSGeo/libgeotiff>,
+        <https://www.ogc.org/standards/geotiff> ;
+    skos:editorialNote "TODO: Is there a version-independent link to the documentation?" ;
+    eo:documentation <https://gis-lab.info/docs/geotiff-1.8.2.pdf> ;
+    eo:fileExtension ".tif",
+        ".tiff" .
+
+eo:GeoZarr a owl:Class ;
+    rdfs:label "GeoZarr" ;
+    rdfs:subClassOf eo:Raster ;
+    oboInOwl:created_by "Matúš Kalaš" ;
+    oboInOwl:creation_date "2023-12-13T22:32:43.63192Z" ;
+    skos:editorialNote "TODO: Is this the spec https://github.com/zarr-developers/geozarr-spec/blob/main/geozarr-spec.md ??? It is a fork of another repo!!!" .
+
+eo:NetCDF_CF a owl:Class ;
+    rdfs:label "NetCDF-CF" ;
+    rdfs:subClassOf eo:Raster ;
+    rdfs:comment "NetCDF-CF is used also for generic geospatial data, not only climate and weather data." ;
+    oboInOwl:comment "From version-4 NetCDF is based on HDF5" ;
+    oboInOwl:hasExactSynonym "NetCDF CF conventions",
+        "NetCDF following the CF metadata conventions" ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/Climate_and_Forecast_Metadata_Conventions> .
+
+eo:VRT a owl:Class ;
+    rdfs:label "VRT" ;
+    rdfs:subClassOf eo:Raster ;
+    oboInOwl:created_by "melibleq" ;
+    oboInOwl:creation_date "2021-08-29T16:08:38.496836Z" ;
+    oboInOwl:hasDefinition "GDAL Virtual Dataset. XML format that maps its attributes and geometries to that of an underlying data source of any GDAL-supported raster format. It transforms features read from other drivers based on criteria specified in an XML control file. It is primarily used to derive spatial layers from flat tables with spatial information in attribute columns. It can also be used to associate coordinate system information with a datasource, merge layers from different datasources into a single data source, or even just to provide an anchor file for access to non-file oriented datasources." ;
+    oboInOwl:hasExactSynonym "GDAL Virtual Format" ;
+    rdfs:seeAlso <https://gdal.org/drivers/vector/vrt.html> ;
+    eo:fileExtension "vrt" .
+
+eo:XDMF a owl:Class ;
+    rdfs:label "XDMF" ;
+    rdfs:subClassOf eo:Raster ;
+    rdfs:comment "This is a conglomerate format with raw data in HDF5 and metadata in XML." ;
+    oboInOwl:created_by "Matúš Kalaš" ;
+    oboInOwl:creation_date "2022-05-06T08:36:05.937701Z" ;
+    oboInOwl:hasExactSynonym "Extensible data model and format" ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/XDMF> .
+
+eo:COG a owl:Class ;
+    rdfs:label "COG" ;
+    rdfs:subClassOf eo:GeoTIFF ;
+    oboInOwl:created_by "melibleq" ;
+    oboInOwl:creation_date "2021-08-29T16:21:48.629321Z" ;
+    oboInOwl:hasDefinition "Regular GeoTIFF file that can be hosted on a HTTP file server. The use of  HTTP GET range requests lets clients ask for just the necessary portions of a GeoTIFF file." ;
+    oboInOwl:hasExactSynonym "Cloud Optimized GeoTIFF" ;
+    rdfs:seeAlso <https://gdal.org/drivers/raster/cog.html>,
+        <https://www.cogeo.org/> ;
+    eo:documentation <https://docs.geoserver.org/latest/en/user/community/cog/cog.html> .
+
+# --- File formats: vector ---
+
+eo:EsriJSON a owl:Class ;
+    rdfs:label "Esri JSON" ;
+    rdfs:subClassOf eo:Vector ;
+    oboInOwl:created_by "mpataky" ;
+    oboInOwl:creation_date "2026-02-15T21:17:34+01:00" ;
+    rdfs:seeAlso <https://support.esri.com/en-us/gis-dictionary/esri-json> ;
+    eo:fileExtension ".json" .
+
+eo:GML a owl:Class ;
+    rdfs:label "GML (Geography Markup Language)" ;
+    rdfs:subClassOf eo:Vector ;
+    rdfs:comment "Not to be confused with the Graph Modelling Language (also GML, with the same file extension)." ;
+    oboInOwl:created_by "Matúš Kalaš" ;
+    oboInOwl:creation_date "2021-08-26T11:59:54.522374Z" ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/Geography_Markup_Language> ;
+    eo:fileExtension "gml" ;
+    eo:mediaType <https://www.iana.org/assignments/media-types/application/gml+xml> .
+
+eo:GPX a owl:Class ;
+    rdfs:label "GPX" ;
+    rdfs:subClassOf eo:Vector ;
+    oboInOwl:created_by "melibleq" ;
+    oboInOwl:creation_date "2021-08-26T04:29:11.969493Z" ;
+    oboInOwl:hasExactSynonym "GPS Exchange Format" ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/GPS_Exchange_Format> ;
+    eo:mediaType "application/gpx+xml (not in IANA)" .
+
+eo:GeoJSON a owl:Class ;
+    rdfs:label "GeoJSON" ;
+    rdfs:subClassOf eo:Vector ;
+    rdfs:comment "Validator https://geojsonlint.com/" ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/GeoJSON>,
+        <https://geojson.org> ;
+    eo:documentation <https://datatracker.ietf.org/doc/html/rfc7946> ;
+    eo:fileExtension "geojson" ;
+    eo:mediaType <https://www.iana.org/assignments/media-types/application/geo+json> .
+
+eo:GeoParquet a owl:Class ;
+    rdfs:label "GeoParquet" ;
+    rdfs:subClassOf eo:Vector ;
+    oboInOwl:created_by "mpataky" ;
+    oboInOwl:creation_date "2026-02-15T22:44:12+01:00" ;
+    eo:documentation "https://geoparquet.org/" ;
+    eo:fileExtension ".geoparquet",
+        ".parquet" .
+
+eo:KML a owl:Class ;
+    rdfs:label "KML" ;
+    rdfs:subClassOf eo:Vector ;
+    rdfs:comment "KML was developed for Google Earth (former Keyhole Earth Viewer), and standardised by the Open Geospatial Consortium (OGC, OpenGIS, https://en.wikipedia.org/wiki/OpenGIS)." ;
+    oboInOwl:hasExactSynonym "Keyhole Markup Language" ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/Keyhole_Markup_Language>,
+        <https://www.ogc.org/standards/kml/> ;
+    eo:documentation <http://docs.opengeospatial.org/is/12-007r2/12-007r2.html>,
+        <https://developers.google.com/kml/documentation/kmlreference> .
+
+eo:OSM_JSON a owl:Class ;
+    rdfs:label "OSM JSON" ;
+    rdfs:subClassOf eo:Vector ;
+    rdfs:comment "How related to https://wiki.openstreetmap.org/wiki/Overpass_JSON?" ;
+    oboInOwl:created_by "Matúš Kalaš" ;
+    oboInOwl:creation_date "2021-08-26T13:21:22.310231Z" .
+
+eo:OSM_XML a owl:Class ;
+    rdfs:label "OSM XML" ;
+    rdfs:subClassOf eo:Vector ;
+    rdfs:comment "TODO recommended to use binary PBF format instead" ;
+    oboInOwl:created_by "melibleq" ;
+    oboInOwl:creation_date "2021-08-26T04:33:21.310981Z" ;
+    oboInOwl:hasBroadSynonym "OpenStreetMap File Formats" ;
+    oboInOwl:hasExactSynonym "OSM Formats" ;
+    rdfs:seeAlso <https://docs.fileformat.com/gis/osm/>,
+        <https://wiki.openstreetmap.org/wiki/OSM_file_formats> .
+
+eo:PBF a owl:Class ;
+    rdfs:label "PBF" ;
+    rdfs:subClassOf eo:Vector ;
+    oboInOwl:created_by "Matúš Kalaš" ;
+    oboInOwl:creation_date "2021-08-26T13:25:05.495509Z" ;
+    oboInOwl:hasExactSynonym "OSM PBF",
+        "OpenStreetMap Protocolbuffer Binary Format" ;
+    rdfs:seeAlso <https://wiki.openstreetmap.org/wiki/PBF_Format> ;
+    eo:fileExtension "osm.pbf" .
+
+eo:Shapefile a owl:Class ;
+    rdfs:label "Shapefile" ;
+    rdfs:subClassOf eo:Vector ;
+    rdfs:comment "Shapefile is a composite format including 3 mandatory files: binary shape/geometry file .shp, shape/geometry index file .shx, and a textual attribute format .dbf). It may contain additional optional files, mostly binary (x-gis/x-shapefile), but some textual or XML." ;
+    rdfs:seeAlso <https://docs.fileformat.com/gis/shp>,
+        <https://docs.fileformat.com/gis/shx>,
+        <https://en.wikipedia.org/wiki/Shapefile> ;
+    eo:documentation <https://www.esri.com/content/dam/esrisites/sitecore-archive/Files/Pdfs/library/whitepapers/pdfs/shapefile.pdf>,
+        <https://www.loc.gov/preservation/digital/formats/fdd/fdd000280.shtml> ;
+    eo:fileExtension "dbf",
+        "shp",
+        "shx" ;
+    eo:mediaType "x-gis/x-shapefile (not in IANA)" .
+
+eo:WKB a owl:Class ;
+    rdfs:label "WKB" ;
+    rdfs:subClassOf eo:Vector ;
+    rdfs:comment "Binary version of WKT" ;
+    oboInOwl:created_by "Matúš Kalaš" ;
+    oboInOwl:creation_date "2022-05-06T08:30:52.099751Z" ;
+    oboInOwl:hasExactSynonym "Well-known binary representation of geometry" ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well-known_binary> .
+
+eo:WKT a owl:Class ;
+    rdfs:label "WKT" ;
+    rdfs:subClassOf eo:Vector ;
+    oboInOwl:created_by "Matúš Kalaš" ;
+    oboInOwl:creation_date "2022-05-06T08:27:51.757844Z" ;
+    oboInOwl:hasExactSynonym "Well-known textual representation of geometry" ;
+    rdfs:seeAlso <https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry> .
+
+# --- File formats: raster and vector ---
+
+eo:GeoPackage a owl:Class ;
+    rdfs:label "GeoPackage" ;
+    rdfs:subClassOf eo:Raster,
+        eo:Vector ;
+    oboInOwl:created_by "mpataky" ;
+    oboInOwl:creation_date "2026-02-15T22:29:45+01:00" ;
+    eo:documentation "https://www.geopackage.org/spec140/index.html" ;
+    eo:fileExtension ".gpkg" .
+
+# --- Measures: annotations ---
+
+eo:appliesToFormat a owl:AnnotationProperty ;
+    rdfs:label "applies to format" ;
+    rdfs:comment "A format class from this vocabulary: the measure can be taken from files of this format and its subclasses. A port annotated with the measure must declare such a format." .
+
+eo:readsContent a owl:AnnotationProperty ;
+    rdfs:label "reads content" ;
+    rdfs:comment "true if taking the measure requires reading the file content (every pixel or feature), not only its metadata. Such measures cost time proportional to the file and should be taken once per input." .
+
+# --- Measures, for rd:complexityVariables ---
+
+eo:BandCount a owl:Class ;
+    rdfs:label "Band count" ;
+    rdfs:subClassOf rd:Measure ;
+    rdfs:comment "Number of bands of a raster." ;
+    eo:appliesToFormat eo:Raster ;
+    eo:readsContent false .
+
+eo:FeatureCount a owl:Class ;
+    rdfs:label "Feature count" ;
+    rdfs:subClassOf rd:Measure ;
+    rdfs:comment "Number of features of a vector file (all layers). Stored in the header of most formats (Shapefile, GeoPackage); text formats such as GeoJSON need a full parse." ;
+    eo:appliesToFormat eo:Vector ;
+    eo:readsContent false .
+
+eo:PixelCount a owl:Class ;
+    rdfs:label "Pixel count" ;
+    rdfs:subClassOf rd:Measure ;
+    rdfs:comment "Width times height of a raster, per band (not multiplied by the band count)." ;
+    eo:appliesToFormat eo:Raster ;
+    eo:readsContent false .
+
+eo:ValidPixelCount a owl:Class ;
+    rdfs:label "Valid pixel count" ;
+    rdfs:subClassOf rd:Measure ;
+    rdfs:comment "Number of pixels of band 1 that are not the band's nodata value, or not 0 if the band has no nodata value. For a binary mask (e.g. a settlement footprint) this is the number of foreground pixels, i.e. how much of the area is covered." ;
+    eo:appliesToFormat eo:Raster ;
+    eo:readsContent true .
+
+eo:VertexCount a owl:Class ;
+    rdfs:label "Vertex count" ;
+    rdfs:subClassOf rd:Measure ;
+    rdfs:comment "Total number of vertices of all geometries of a vector file. Reflects geometric complexity, which feature count does not (one detailed polygon vs. many simple ones)." ;
+    eo:appliesToFormat eo:Vector ;
+    eo:readsContent true .
