@@ -7,3 +7,9 @@ dependencies = ["rdflib>=7.1"]
 
 [tool.uv]
 package = false
+
+[tool.ruff]
+line-length = 130
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
