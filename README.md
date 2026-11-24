@@ -28,8 +28,8 @@ The **resource demand** vocabulary states how the resource demand of a CWL tool 
 inputs (parametric dependencies). Input parameters declare `complexityVariables` (a symbol and a
 `Measure`: `Value`, `ArrayLength`, `FileSize`, `DerivedMeasure` computed by a `probe` tool, or a
 domain measure such as `eo:PixelCount`); `ResourceRequirement` states `ramDemand` and `timeDemand`
-as a sum of terms, each a product of factors, each a variable with a `ComplexityClass` (`Constant`,
-`Logarithmic`, `Linear`, `Linearithmic`, `Quadratic`, `Cubic`, `Exponential`). Only the shape is
+as a sum of terms, each a mapping from variables to a `ComplexityClass` (`Constant`, `Logarithmic`,
+`Linear`, `Linearithmic`, `Quadratic`, `Cubic`, `Exponential`) whose entries are multiplied. Only the shape is
 annotated; coefficients come from measurements.
 
 ## Use in CWL
@@ -53,8 +53,8 @@ Resource demand (with `rd: "https://dfg-sos.github.io/ontologies/resource-demand
 hints:
   ResourceRequirement:
     rd:timeDemand:
-      - factors: [{variable: n, complexity: rd:Linear}]
-      - factors: [{variable: d, complexity: rd:Linearithmic}]
+      - n: rd:Linear
+      - d: rd:Linearithmic
 inputs:
   mask:
     type: File
@@ -63,7 +63,8 @@ inputs:
       - {symbol: n, measure: eo:PixelCount}
       - {symbol: d, measure: eo:ValidPixelCount}
 ```
-Keys inside these fields must not be `id`, `name`, `type` or `format`: CWL's loader rewrites them.
+Keys inside these fields, including the symbols of variables, must not be `id`, `name`, `type` or
+`format`: CWL's loader rewrites them.
 
 `eo-formats.owl` is required in `$schemas`: CWL uses it for `format` checks, e.g. to accept a
 `Shapefile` where a `Vector` is expected. CWL does not follow `owl:imports`, and it does not need
