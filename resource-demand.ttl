@@ -5,8 +5,9 @@
 @prefix rd: <https://dfg-sos.github.io/ontologies/resource-demand#> .
 
 <https://dfg-sos.github.io/ontologies/resource-demand> a owl:Ontology ;
-    owl:versionInfo "1.0.0" ;
-    owl:versionIRI <https://dfg-sos.github.io/ontologies/releases/resource-demand/1.0.0/resource-demand.owl> ;
+    owl:versionInfo "1.1.0" ;
+    owl:versionIRI <https://dfg-sos.github.io/ontologies/releases/resource-demand/1.1.0/resource-demand.owl> ;
+    owl:priorVersion <https://dfg-sos.github.io/ontologies/releases/resource-demand/1.0.0/resource-demand.owl> ;
     dcterms:title "SOS resource demand annotations for CWL" ;
     dcterms:description "Extension fields for CWL documents that state how the resource demand of a tool grows with its inputs (parametric dependencies), as a static annotation next to the input schema: complexity variables on input parameters, demand expressions in ResourceRequirement. The annotation states only the shape of the dependency (a sum of products of complexity classes); coefficients are not part of it. A complexity variable stands for a Measure of an input: its value, array length or file size, a domain measure such as the pixel count of a raster (see eo-formats), or a derived measure computed by a probe tool. Declare the namespace in a CWL document with $namespaces: {rd: \"https://dfg-sos.github.io/ontologies/resource-demand#\"}." ;
     dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
@@ -26,6 +27,15 @@ rd:growthFunction a owl:AnnotationProperty ;
 rd:unit a owl:AnnotationProperty ;
     rdfs:label "unit" ;
     rdfs:comment "Unit in which the demand of a demand property is estimated." .
+
+rd:appliesToFormat a owl:AnnotationProperty ;
+    rdfs:label "applies to format" ;
+    rdfs:comment "On a rd:Measure subclass: a file format class (from any vocabulary, e.g. eo:Raster) the measure can be taken from, including its subclasses. An input annotated with the measure must declare such a format. A measure without this annotation does not depend on the format." .
+
+rd:readsContent a owl:AnnotationProperty ;
+    rdfs:label "reads content" ;
+    rdfs:comment "On a rd:Measure subclass: true if taking the measure requires reading the whole file content (every pixel, feature or record), not only its metadata. Such measures cost time proportional to the file and should be taken once per input." ;
+    rdfs:range xsd:boolean .
 
 # --- Measures ---
 
