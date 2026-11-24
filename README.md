@@ -17,8 +17,8 @@ The **EO vocabulary** covers Earth Observation and GIS files:
   metadata a file must have beyond its format. They are defined in the `cwl#` namespace (`cwl.ttl`),
   which the EO vocabulary imports;
 - **measures** (since 1.1.0): quantities probed from raster and vector files (`PixelCount`,
-  `BandCount`, `ValidPixelCount`, `FeatureCount`, `VertexCount`), each tied with `appliesToFormat`
-  to the formats it can be taken from and marked with `readsContent` if the probe reads the whole file.
+  `BandCount`, `ValidPixelCount`, `FeatureCount`, `VertexCount`), each tied with `rd:appliesToFormat`
+  to the formats it can be taken from and marked with `rd:readsContent` if the probe reads the whole file.
   They are `rd:Measure`s, for use as complexity variables.
 
 The vocabulary keeps its published file `eo-formats.owl` and namespace `eo-formats#` from 1.0.0,

@@ -8,13 +8,13 @@
 @prefix rd: <https://dfg-sos.github.io/ontologies/resource-demand#> .
 
 <https://dfg-sos.github.io/ontologies/eo-formats> a owl:Ontology ;
-    owl:versionInfo "1.1.0" ;
-    owl:versionIRI <https://dfg-sos.github.io/ontologies/releases/eo-formats/1.1.0/eo-formats.owl> ;
-    owl:priorVersion <https://dfg-sos.github.io/ontologies/releases/eo-formats/1.0.0/eo-formats.owl> ;
+    owl:versionInfo "1.2.0" ;
+    owl:versionIRI <https://dfg-sos.github.io/ontologies/releases/eo-formats/1.2.0/eo-formats.owl> ;
+    owl:priorVersion <https://dfg-sos.github.io/ontologies/releases/eo-formats/1.1.0/eo-formats.owl> ;
     owl:imports <https://dfg-sos.github.io/ontologies/releases/cwl/1.0.0/cwl.owl>,
-        <https://dfg-sos.github.io/ontologies/releases/resource-demand/1.0.0/resource-demand.owl> ;
+        <https://dfg-sos.github.io/ontologies/releases/resource-demand/1.1.0/resource-demand.owl> ;
     dcterms:title "SOS Earth Observation vocabulary" ;
-    dcterms:description "Earth Observation / GIS vocabulary. File formats: a taxonomy of EO file formats (GeoTIFF, COG, Shapefile, GeoJSON, ...) under the abstract classes Raster and Vector; format compatibility follows rdfs:subClassOf. File metadata: the fields sos:expectedCRS and sos:expectedGeometryType, defined in the imported cwl vocabulary. Measures: quantities of raster and vector files (pixel count, feature count, ...) that a runner probes from an input file, for use as complexity variables (rd:complexityVariables of the imported resource-demand vocabulary); each states with eo:appliesToFormat which formats it can be taken from. Declare in a CWL document with $namespaces: {eo: \"https://dfg-sos.github.io/ontologies/eo-formats#\"}." ;
+    dcterms:description "Earth Observation / GIS vocabulary. File formats: a taxonomy of EO file formats (GeoTIFF, COG, Shapefile, GeoJSON, ...) under the abstract classes Raster and Vector; format compatibility follows rdfs:subClassOf. File metadata: the fields sos:expectedCRS and sos:expectedGeometryType, defined in the imported cwl vocabulary. Measures: quantities of raster and vector files (pixel count, feature count, ...) that a runner probes from an input file, for use as complexity variables (rd:complexityVariables of the imported resource-demand vocabulary); each states with rd:appliesToFormat which formats it can be taken from. Declare in a CWL document with $namespaces: {eo: \"https://dfg-sos.github.io/ontologies/eo-formats#\"}." ;
     dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
     dcterms:publisher "DFG project SOS" ;
     rdfs:seeAlso <https://github.com/dfg-sos/ontologies> .
@@ -297,13 +297,19 @@ eo:GeoPackage a owl:Class ;
 
 # --- Measures: annotations ---
 
+# Deprecated since 1.2.0: they describe measures in general, so they moved to resource-demand 1.1.0.
+
 eo:appliesToFormat a owl:AnnotationProperty ;
     rdfs:label "applies to format" ;
-    rdfs:comment "A format class from this vocabulary: the measure can be taken from files of this format and its subclasses. A port annotated with the measure must declare such a format." .
+    rdfs:comment "Deprecated: use rd:appliesToFormat." ;
+    owl:deprecated true ;
+    rdfs:seeAlso rd:appliesToFormat .
 
 eo:readsContent a owl:AnnotationProperty ;
     rdfs:label "reads content" ;
-    rdfs:comment "true if taking the measure requires reading the file content (every pixel or feature), not only its metadata. Such measures cost time proportional to the file and should be taken once per input." .
+    rdfs:comment "Deprecated: use rd:readsContent." ;
+    owl:deprecated true ;
+    rdfs:seeAlso rd:readsContent .
 
 # --- Measures, for rd:complexityVariables ---
 
@@ -311,33 +317,33 @@ eo:BandCount a owl:Class ;
     rdfs:label "Band count" ;
     rdfs:subClassOf rd:Measure ;
     rdfs:comment "Number of bands of a raster." ;
-    eo:appliesToFormat eo:Raster ;
-    eo:readsContent false .
+    rd:appliesToFormat eo:Raster ;
+    rd:readsContent false .
 
 eo:FeatureCount a owl:Class ;
     rdfs:label "Feature count" ;
     rdfs:subClassOf rd:Measure ;
     rdfs:comment "Number of features of a vector file (all layers). Stored in the header of most formats (Shapefile, GeoPackage); text formats such as GeoJSON need a full parse." ;
-    eo:appliesToFormat eo:Vector ;
-    eo:readsContent false .
+    rd:appliesToFormat eo:Vector ;
+    rd:readsContent false .
 
 eo:PixelCount a owl:Class ;
     rdfs:label "Pixel count" ;
     rdfs:subClassOf rd:Measure ;
     rdfs:comment "Width times height of a raster, per band (not multiplied by the band count)." ;
-    eo:appliesToFormat eo:Raster ;
-    eo:readsContent false .
+    rd:appliesToFormat eo:Raster ;
+    rd:readsContent false .
 
 eo:ValidPixelCount a owl:Class ;
     rdfs:label "Valid pixel count" ;
     rdfs:subClassOf rd:Measure ;
     rdfs:comment "Number of pixels of band 1 that are not the band's nodata value, or not 0 if the band has no nodata value. For a binary mask (e.g. a settlement footprint) this is the number of foreground pixels, i.e. how much of the area is covered." ;
-    eo:appliesToFormat eo:Raster ;
-    eo:readsContent true .
+    rd:appliesToFormat eo:Raster ;
+    rd:readsContent true .
 
 eo:VertexCount a owl:Class ;
     rdfs:label "Vertex count" ;
     rdfs:subClassOf rd:Measure ;
     rdfs:comment "Total number of vertices of all geometries of a vector file. Reflects geometric complexity, which feature count does not (one detailed polygon vs. many simple ones)." ;
-    eo:appliesToFormat eo:Vector ;
-    eo:readsContent true .
+    rd:appliesToFormat eo:Vector ;
+    rd:readsContent true .
